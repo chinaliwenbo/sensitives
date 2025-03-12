@@ -44,3 +44,6 @@
 	// 打印查看结果
 	cSearch.DebugPrintSearchResult(searchString, searchResult)
 ```
+
+### 联系作者
+email发送至: liwenbo.csu@gmail.com
