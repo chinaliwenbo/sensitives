@@ -102,6 +102,10 @@ DFA_Node *createDFA_Node_And_Init(const uint8_t **sensitive_words, int length){
         申请内存, 并初始化所有节点, 占用2GB的内存, 后续可以考虑使用
     */
     DFA_Node *dfa = (DFA_Node *) malloc(sizeof(DFA_Node) * MAX_NODE_NUM);
+    if (dfa == NULL){
+        printf("内存申请失败, 请确保有足够的内存大小\n");
+        return NULL;
+    }
 
     // 初始化根节点
     int nodeCount = 0;
