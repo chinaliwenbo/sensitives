@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"sync"
 	"time"
 	"unsafe"
 )
@@ -17,7 +18,8 @@ type CSearch struct {
 	dfaNode *C.DFA_Node
 
 	// Padding to achieve 64-byte alignment
-	_ [56]byte // 56 bytes
+	//_ [56]byte // 56 bytes
+	rwMutex sync.RWMutex
 }
 
 // MakeCSearch 创建对象, 约占用3GB内存
@@ -45,6 +47,13 @@ func MakeCSearch(allSensitiveWords []string) (*CSearch, error) {
 
 // UpdateCSearch 全量更新词表
 func (s *CSearch) UpdateCSearch(allSensitiveWords []string) error {
+	// 先拿锁, 避免多个协程同时更新造成内存浪费
+	if ok := s.rwMutex.TryLock(); ok {
+		defer s.rwMutex.Unlock()
+	} else {
+		return nil
+	}
+
 	// Create a C array to hold the pointers to the strings
 	cStrings := make([]*C.uchar, len(allSensitiveWords))
 	for i, s := range allSensitiveWords {
